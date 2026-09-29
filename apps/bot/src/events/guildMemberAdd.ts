@@ -1,16 +1,15 @@
-import { Client, Events, Guild } from 'discord.js';
-import { GuildService } from '../services/GuildService';
+import { Client, Events, GuildMember } from 'discord.js';
+import { WelcomeService } from '../services/WelcomeService';
 import { logger } from '../utils/logger';
 
-const guildService = new GuildService();
+const welcomeService = new WelcomeService();
 
-export function registerGuildCreate(client: Client) {
-  client.on(Events.GuildCreate, async (guild: Guild) => {
+export function registerGuildMemberAdd(client: Client) {
+  client.on(Events.GuildMemberAdd, async (member: GuildMember) => {
     try {
-      await guildService.ensureGuild(guild.id, guild.name);
-      logger.info(`Joined new guild: ${guild.name} (${guild.id})`);
+      await welcomeService.sendWelcome(member);
     } catch (error) {
-      logger.error(`Failed to initialize guild ${guild.id}`, error);
+      logger.error(`Failed to process guildMemberAdd for ${member.guild.id}`, error);
     }
   });
 }
